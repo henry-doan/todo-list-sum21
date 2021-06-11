@@ -1,6 +1,7 @@
 import { Component } from 'react';
 import TodoList from './components/todos/TodoList';
 import TodoForm from './components/todos/TodoForm';
+import FilterBar from './components/shared/FilterBar';
 
 class App extends Component {
   state = { todos: [
@@ -8,7 +9,12 @@ class App extends Component {
     { id: 2, title: "Learn React", complete: false },
     { id: 3, title: "Learn Router", complete: false },
     // { id: 5, title: "eat dinner ", complete: false }
-  ]}
+  ], filter: 'All' }
+
+  setFilter = (filter) => {
+    // this.setState({ filter: filter })
+    this.setState({ filter })
+  }
 
   // helper function to gen id
   getUniqId = () => {
@@ -40,17 +46,40 @@ class App extends Component {
     })
   }
 
+  visibleItems = () => {
+    const { todos, filter } = this.state 
+    // const todos = this.state.todos 
+    // const filter = this.state.filter 
+    switch(filter) {
+      case 'Active':
+        return todos.filter( t => !t.complete)
+      case 'Complete':
+        return todos.filter( t => t.complete)
+      default:
+        return todos
+    }
+  }
+
   render() {
-    const { todos } = this.state
+    const { todos, filter } = this.state
     return (
       <>
         <h1>My Todo List</h1>
         <TodoForm addTodo={this.addTodo} />
-        <TodoList 
-          todos={todos} 
-          name="dpl" 
-          completeUpdate={this.completeUpdate} 
-        />
+        <FilterBar filter={filter} setFilter={this.setFilter} />
+        {
+          todos.length > 0 ? 
+          <TodoList 
+            // todos={todos} 
+            todos={this.visibleItems()} 
+            name="dpl" 
+            completeUpdate={this.completeUpdate} 
+          />
+          :
+          <p>
+            No todos
+          </p>
+        }
       </>
     )
   }
